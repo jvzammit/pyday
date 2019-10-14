@@ -14,11 +14,11 @@ pyenv activate djmdenv  # activate pydayenv
 pip install -r requirements.txt
 ```
 
-* Ensure your `pip freeze` output includes the packages below (might contain more, but these are the ones required for this workshop session):
+* Ensure your `pip freeze` output includes the packages below (might contain more because each install carries its own dependencies, but these are the ones strictly required for this workshop session):
 
 ```
 Django==2.2.6
-TODO
+django-markdownx==2.0.28
 ```
 
 ## Create Django Project and Run Dev Server
@@ -88,7 +88,7 @@ class ArticleAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Article)
+admin.site.register(Article, ArticleAdmin)
 ```
 
 * `./manage.py runserver`
@@ -165,10 +165,11 @@ urlpatterns = [
 Finally enhance your `Article` model by adding the handy `get_absolute_url` function to `articles/models.py`:
 
 ```
+[ ... ]
 from django.urls import reverse
 
-class Article(..):
-    ...
+class Article(models.Model):
+    [ ... ]
 
     def get_absolute_url(self):
         return reverse('article_detail', kwargs={'slug': self.slug})
@@ -217,13 +218,8 @@ $ ./manage.py collectstatic
 119 static files copied to '/Users/jv/dev/pyday/djmd/djmd/static'.
 ```
 
-
-
-
 ## Part 3: Markdown editor + preview
 Enable a Markdown editor with preview in the Django admin.
-
-
 
 
 * Ensure you have `markdownx` installed
@@ -233,21 +229,68 @@ $ pip freeze | grep markdownx
 django-markdownx==2.0.28
 ```
 
+* Add `markdownx` to your `settings.INSTALLED_APPS` in `djmd/settings.py`:
+
+```
+INSTALLED_APPS = [
+    # ... the remaining INSTALLED_APPS here ...
+    `markdownx`,
+]
+```
+
 * Expose `markdownx` URLs by adding them to your `urls.py` config:
 
 ```
+[ ... ]
 
+from django.urls import (
+    include,
+    path,
+)
+
+[ ... ]
+
+urlpatterns = [
+    # ... the rest of your URLconf goes here ...
+    path('markdownx/', include('markdownx.urls')),
+]
 ```
 
-  * Run command to relocate ("copy" in this case) static files to a place where your local dev server can serve them
+* Enhance existing admin class in `articles/admin.py` to render `AdminMarkdownxWidget` for `TextField` form fields:
+
+```
+[ ... ] 
+
+from markdownx.widgets import AdminMarkdownxWidget
+
+[ ... ]
+
+
+class ArticleAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.TextField: {'widget': AdminMarkdownxWidget},
+    }
+``` 
+
+* Run command to relocate ("copy" in this case) static files to a place where your local dev server can serve them
 
 ```
 $ ./manage.py collectstatic
+
+[...]
+
+Type 'yes' to continue, or 'no' to cancel: yes
+
+4 static files copied to '/Users/jv/dev/pyday/djmd/djmd/static', 119 unmodified.
 ```
+
+* Go back to your local server and refresh the article admin screen. `/admin/articles/article/1/change/` should look like this:
+
+![markdown editor screenshot](editor_scrshot.png "markdown editor screenshot")
 
 
 ### Part 3: Checkpoint
-* Article admin accepts markdown, showing preview as you along.
+* Article admin accepts markdown, showing preview as you edit.
 
 ## Part 4: Render Markdown as HTML to end user
 * Rendering the Markdown as HTML to the end user
@@ -257,3 +300,8 @@ $ ./manage.py collectstatic
 * Your article's markdown content renders as HTML.
 
 
+## Part 5: Take home fun
+
+Your product owner knows SEO. She convinces us that we do not want to lose "link juice" and therefore we want the Markdown editor to automatically set the HTML anchor link attribute `rel="nofollow"` on any links that take the user outside the site.
+
+P.S. Keep in mind that emitting HTML with the `rel="nofollow"` set is enough. No need to "update" the "source" data saved by the markdown editor.

@@ -16,11 +16,15 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import (
+    include,
+    path,
+)
 
 from articles.views import ArticleDetailView
 
 urlpatterns = [
+    path('markdownx/', include('markdownx.urls')),
     path(
         'articles/<slug:slug>/',
         ArticleDetailView.as_view(), name='article_detail'),
