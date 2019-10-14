@@ -293,15 +293,42 @@ Type 'yes' to continue, or 'no' to cancel: yes
 * Article admin accepts markdown, showing preview as you edit.
 
 ## Part 4: Render Markdown as HTML to end user
-* Rendering the Markdown as HTML to the end user
+By looking at the `mardownx` "Customisation" link [here](https://neutronx.github.io/django-markdownx/customization/#markdownx_markdownify_function), one can learn which package `mardownx` is using for interpreting `markdown`. One can check also by looking at the pip packages instead. Let's reuse that package:
+
+* Add shorthand model function `content_html`:
+
+```
+from markdownx.utils import markdownify
+
+[...]
+
+class Article():
+    
+    [...]
+
+    def content_html(self):
+        return markdownify(self.content)
+```
+
+* At template-level replace `{{ object.content_html }}` with:
+
+```
+{% autoescape off %}{{ object.content_html }}{% endautoescape %}
+```
+
 * `autoescape` docs [here](https://docs.djangoproject.com/en/2.2/ref/templates/builtins/#autoescape)
 
 ### Part 4: Checkpoint
-* Your article's markdown content renders as HTML.
+* Your article's markdown content renders as HTML, test URL: `/articles/search-engines/`
 
 
 ## Part 5: Take home fun
 
-Your product owner knows SEO. She convinces us that we do not want to lose "link juice" and therefore we want the Markdown editor to automatically set the HTML anchor link attribute `rel="nofollow"` on any links that take the user outside the site.
+### Fun Exercise 1: Doing things right with unit tests
+Write unit tests where applicable (i.e. the two model functions we added). Use `mock` module to assert call to `markdownify` has received the correct parameters and ensuring that expected output does not break the test in case internal implementation of `markdownify` produces different markup in the future.
+
+### Fun Exercise 2: Your product owner ;)
+
+Your product owner is into SEO. She convinces us that we do not want to lose "link juice" and therefore we want the Markdown editor to automatically set the HTML anchor link attribute `rel="nofollow"` on any links that take the user outside the site.
 
 P.S. Keep in mind that emitting HTML with the `rel="nofollow"` set is enough. No need to "update" the "source" data saved by the markdown editor.

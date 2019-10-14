@@ -3,6 +3,6 @@
 	<head>Articles: {{ object.title }}</head>
 <body>
     <h1>{{ object.title }}</h1>
-    {{ object.content }}
+    {% autoescape off %}{{ object.content_html }}{% endautoescape %}
 </body>
 </html>

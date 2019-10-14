@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
+from markdownx.utils import markdownify
+
 
 class Article(models.Model):
     slug = models.SlugField()
@@ -12,3 +14,6 @@ class Article(models.Model):
 
     def get_absolute_url(self):
         return reverse('article_detail', kwargs={'slug': self.slug})
+
+    def content_html(self):
+        return markdownify(self.content)
