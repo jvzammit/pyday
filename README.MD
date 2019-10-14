@@ -39,7 +39,7 @@ Article has a `slug`, `title` and `content` fields. `content` field should accep
 ![problem description image](problem-description.png "problem description image")
 
 
-# Steps
+# Action
 
 ## Part 1. Create article editor & Render article
 
@@ -179,18 +179,81 @@ class Article(..):
 ### Part 1: Checkpoint
 * You should see the article rendered after entering it via admin.
 
-## Part 2: Markdown editor + preview
-* Enable a Markdown editor with preview in the Django admin
+
+## Part 2: Static Files
+To set up local server for serving static files:
+
+* Set the `STATIC_ROOT` setting
+
+```
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+```
+
+Add the below code to your `urls.py` (docs reference [here](https://docs.djangoproject.com/en/2.2/howto/static-files/#serving-static-files-during-development)):
+
+
+```
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... the rest of your URLconf goes here ...
+]
+
+if settings.DEBUG:  # local development
+    urlpatterns = urlpatterns + static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+```
+
 
 ### Part 2: Checkpoint
+
+Run the below command, and get static files copied to your `djmd/static` directory.
+
+```
+$ ./manage.py collectstatic
+
+119 static files copied to '/Users/jv/dev/pyday/djmd/djmd/static'.
+```
+
+
+
+
+## Part 3: Markdown editor + preview
+Enable a Markdown editor with preview in the Django admin.
+
+
+
+
+* Ensure you have `markdownx` installed
+
+```
+$ pip freeze | grep markdownx
+django-markdownx==2.0.28
+```
+
+* Expose `markdownx` URLs by adding them to your `urls.py` config:
+
+```
+
+```
+
+  * Run command to relocate ("copy" in this case) static files to a place where your local dev server can serve them
+
+```
+$ ./manage.py collectstatic
+```
+
+
+### Part 3: Checkpoint
 * Article admin accepts markdown, showing preview as you along.
 
-## Part 3: Render Markdown as HTML to end user
+## Part 4: Render Markdown as HTML to end user
 * Rendering the Markdown as HTML to the end user
 * `autoescape` docs [here](https://docs.djangoproject.com/en/2.2/ref/templates/builtins/#autoescape)
 
-### Part 3: Checkpoint
+### Part 4: Checkpoint
 * Your article's markdown content renders as HTML.
-
 
 

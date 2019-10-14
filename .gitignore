@@ -124,5 +124,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# vscode files
+# djmd project-specific settings
 djmd/djmd.code-workspace
+djmd/djmd/static
+
