@@ -9,8 +9,8 @@ The workshop author has this setup:
 
 ```
 pyenv install 3.7.2  # if not installed
-pyenv virtualenv 3.7.2 djmdenv  # create virtualenv "pydayenv"
-pyenv activate djmdenv  # activate pydayenv
+pyenv virtualenv 3.7.2 djmdenv  # create virtualenv "djmdenv"
+pyenv activate djmdenv  # activate djmdenv
 pip install -r requirements.txt
 ```
 
@@ -44,7 +44,7 @@ Article has a `slug`, `title` and `content` fields. `content` field should accep
 ## Part 1. Create article editor & Render article
 
 * Create `articles` app:
-* 
+
 ```
 ./manage.py startapp articles
 ```
@@ -115,14 +115,14 @@ In _my_ opinion that would be [DuckDuckGo](https://duckduckgo.com/). I've been *
   * Automatically renders to template `articles/templates/articles/article_detail.html`, therefore:
 
 ```
-$ mkdir -p articles/templates/articles
+$ mkdir -p articles/templates/articles/
 $ vim articles/templates/articles/article_detail.html
 ```
 
 And paste:
 
 ```
-<!-- templates/article_detail.html -->
+<!-- articles/templates/articles/article_detail.html -->
 <html>
 	<head>Articles: {{ object.title }}</head>
 <body>
@@ -179,6 +179,7 @@ class Article(models.Model):
 
 ### Part 1: Checkpoint
 * You should see the article rendered after entering it via admin.
+* "Vanilla" Django so far.
 
 
 ## Part 2: Static Files
@@ -202,7 +203,7 @@ urlpatterns = [
     # ... the rest of your URLconf goes here ...
 ]
 
-if settings.DEBUG:  # local development
+if settings.DEBUG:  # assumption: DEBUG == local dev env
     urlpatterns = urlpatterns + static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 ```
@@ -210,13 +211,15 @@ if settings.DEBUG:  # local development
 
 ### Part 2: Checkpoint
 
-Run the below command, and get static files copied to your `djmd/static` directory.
+* Run the below command, and get static files copied to your `djmd/static` directory.
 
 ```
 $ ./manage.py collectstatic
 
-119 static files copied to '/Users/jv/dev/pyday/djmd/djmd/static'.
+119 static files copied to '[...]/djmd/djmd/static'.
 ```
+
+* Again, "Vanilla" Django so far.
 
 ## Part 3: Markdown editor + preview
 Enable a Markdown editor with preview in the Django admin.
@@ -281,7 +284,7 @@ $ ./manage.py collectstatic
 
 Type 'yes' to continue, or 'no' to cancel: yes
 
-4 static files copied to '/Users/jv/dev/pyday/djmd/djmd/static', 119 unmodified.
+4 static files copied to '[...]/djmd/djmd/static', 119 unmodified.
 ```
 
 * Go back to your local server and refresh the article admin screen. `/admin/articles/article/1/change/` should look like this:
@@ -293,7 +296,7 @@ Type 'yes' to continue, or 'no' to cancel: yes
 * Article admin accepts markdown, showing preview as you edit.
 
 ## Part 4: Render Markdown as HTML to end user
-By looking at the `mardownx` "Customisation" link [here](https://neutronx.github.io/django-markdownx/customization/#markdownx_markdownify_function), one can learn which package `mardownx` is using for interpreting `markdown`. One can check also by looking at the pip packages instead. Let's reuse that package:
+By looking at the `mardownx` "Customisation" link [here](https://neutronx.github.io/django-markdownx/customization/#markdownx_markdownify_function), one can learn which package `mardownx` is using for interpreting `markdown`. One can check also by looking at the pip packages instead (`pip freeze | grep -i markdown`). Let's reuse that package:
 
 * Add shorthand model function `content_html`:
 
@@ -331,4 +334,8 @@ Write unit tests where applicable (i.e. the two model functions we added). Use `
 
 Your product owner is into SEO. She convinces us that we do not want to lose "link juice" and therefore we want the Markdown editor to automatically set the HTML anchor link attribute `rel="nofollow"` on any links that take the user outside the site.
 
-P.S. Keep in mind that emitting HTML with the `rel="nofollow"` set is enough. No need to "update" the "source" data saved by the markdown editor.
+Keep in mind that emitting HTML with the `rel="nofollow"` set is enough. No need to "update" the "source" data saved by the markdown editor.
+
+## Part 6: Fill the Laziness Quiz
+
+Link to Google Form: [https://forms.gle/rs3gQkiZUt3jUtVdA](https://forms.gle/rs3gQkiZUt3jUtVdA)
